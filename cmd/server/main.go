@@ -11,6 +11,7 @@ import (
     "github.com/gin-gonic/gin"
     "gorm.io/driver/postgres"
     "gorm.io/gorm"
+	"github.com/gin-contrib/cors"
     "os"
 )
 
@@ -37,6 +38,12 @@ func main() {
     // Setup HTTP server
     r := gin.Default()
     handler.NewUserHandler(r, uc)
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // Your React app URL
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
     log.Println("Server running on :8080")
     r.Run(":8080")
