@@ -8,6 +8,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(user *entity.User) error
+	DeleteUser(userID string) error
 	GetUserByEmail(email string) (*entity.User, error)
 	GetLastUserID() (string, error)
 }
@@ -22,6 +23,10 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 
 func (urd *userRepositoryData) CreateUser(user *entity.User) error {
 	return urd.db.Create(user).Error
+}
+
+func (urd *userRepositoryData) DeleteUser(userID string) error {
+	return urd.db.Where("user_id = ?", userID).Delete(&entity.User{}).Error
 }
 
 func (urd *userRepositoryData) GetUserByEmail(email string) (*entity.User, error) {

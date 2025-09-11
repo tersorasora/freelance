@@ -13,6 +13,7 @@ import (
 type UserUsecase interface {
 	RegisterUser(email string, name string, password string) (*entity.User, error)
 	LoginUser(email, password string) (*entity.User, error)
+	DeleteUser(userID string) error
 }
 
 type userUsecase struct {
@@ -75,7 +76,7 @@ func (uuc *userUsecase) RegisterUser(email string, name string, password string)
 func (uuc *userUsecase) LoginUser(email, password string) (*entity.User, error) {
 	user, err := uuc.repo.GetUserByEmail(email)
 	if err != nil {
-		return nil, errors.New("email atau password salah")
+		return nil, errors.New("email belum terdaftar")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
@@ -84,4 +85,13 @@ func (uuc *userUsecase) LoginUser(email, password string) (*entity.User, error) 
     }
 
 	return user, nil
+}
+
+func (uuc *userUsecase) DeleteUser(userID string) error {
+	err := uuc.repo.DeleteUser(userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

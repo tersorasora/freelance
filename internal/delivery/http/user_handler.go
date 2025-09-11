@@ -15,6 +15,7 @@ func NewUserHandler(router *gin.Engine, uuc usecase.UserUsecase) {
 	handler := &UserHandler{uuc}
 	router.POST("/register", handler.Register)
 	router.POST("/login", handler.Login)
+	router.DELETE("/user/:user_id", handler.DeleteUser)
 }
 
 func (h *UserHandler) Register(c *gin.Context) {
@@ -66,4 +67,20 @@ func (h *UserHandler) Login(c *gin.Context) {
 		"user_id": user.UserID,
 		"email": user.Email,
 	})
+}
+
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	userID := c.Param("user_id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required"})
+		return
+	}
+	
+	err := h.uuc.DeleteUser(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User berhasil dihapus"})
 }
