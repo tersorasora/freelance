@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	CreateUser(user *entity.User) error
 	GetUserByEmail(email string) (*entity.User, error)
+	GetLastUserID() (string, error)
 }
 
 type userRepositoryData struct {
@@ -30,4 +31,15 @@ func (urd *userRepositoryData) GetUserByEmail(email string) (*entity.User, error
 		return nil, result.Error
 	}
 	return &user, nil
+}
+
+func (urd *userRepositoryData) GetLastUserID() (string, error) {
+	var lastUser string
+
+	err := urd.db.Model(&entity.User{}).Order("user_id DESC").Limit(1).Pluck("user_id", &lastUser).Error
+	if err != nil{
+		return "", err
+	}
+
+	return lastUser, nil
 }

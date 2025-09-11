@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 
 	"github.com/tersorasora/freelance/internal/entity"
 	"github.com/tersorasora/freelance/internal/repository"
-
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -30,16 +30,38 @@ func (uuc *userUsecase) RegisterUser(email string, name string, password string)
         return nil, errors.New("email sudah terdaftar")
     }
 
+	lastID, err := uuc.repo.GetLastUserID()
+	if err != nil {
+		return nil, err
+	}
+
+	var newID int
+	var newUserID string
+	if lastID == "" {
+		newID = 1
+	}else{
+		parts := strings.Split(lastID, "-")
+		if len(parts) == 2 {
+			lastNumber, _ := strconv.Atoi(parts[1])
+			newID = lastNumber + 1
+		}else{
+			newID = 1
+		}
+	}
+	newUserID = "UID-" + strconv.Itoa(newID)
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
     user := &entity.User{
-        UserID: uuid.NewString(),
+        UserID: newUserID,
         Email:  email,
 		Name:   name,
 		Password: string(hashedPassword),
+		Balance: 0.00,
+		RoleID: "RL-2", // Default role as regular user
     }
 
     err = uuc.repo.CreateUser(user)
