@@ -13,6 +13,7 @@ import (
 type UserUsecase interface {
 	RegisterUser(email string, name string, password string) (*entity.User, error)
 	LoginUser(email, password string) (*entity.User, error)
+	GetUser(userID string) (*entity.User, error)
 	DeleteUser(userID string) error
 }
 
@@ -62,7 +63,7 @@ func (uuc *userUsecase) RegisterUser(email string, name string, password string)
 		Name:   name,
 		Password: string(hashedPassword),
 		Balance: 0.00,
-		RoleID: "RL-2", // Default role as regular user
+		RoleID: "RLI-2", // Default role as regular user
     }
 
     err = uuc.repo.CreateUser(user)
@@ -84,6 +85,14 @@ func (uuc *userUsecase) LoginUser(email, password string) (*entity.User, error) 
         return nil, errors.New("email atau password salah")
     }
 
+	return user, nil
+}
+
+func (uuc *userUsecase) GetUser(userID string) (*entity.User, error) {
+	user, err := uuc.repo.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
 	return user, nil
 }
 

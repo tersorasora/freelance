@@ -4,7 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-    "github.com/tersorasora/freelance/internal/usecase"
+	"github.com/tersorasora/freelance/internal/auth"
+	"github.com/tersorasora/freelance/internal/delivery/middleware"
+	"github.com/tersorasora/freelance/internal/usecase"
 )
 
 type UserHandler struct {
@@ -15,7 +17,15 @@ func NewUserHandler(router *gin.Engine, uuc usecase.UserUsecase) {
 	handler := &UserHandler{uuc}
 	router.POST("/register", handler.Register)
 	router.POST("/login", handler.Login)
-	router.DELETE("/user/:user_id", handler.DeleteUser)
+	router.GET("/user/:user_id", handler.GetUser)
+	
+	// protected routes
+	authGroup := router.Group("/")
+	authGroup.Use(middleware.AuthMiddleware())
+	{
+		authGroup.GET("/profile", handler.GetProfile)
+		authGroup.DELETE("/user/:user_id", handler.DeleteUser)
+	}	
 }
 
 func (h *UserHandler) Register(c *gin.Context) {
@@ -62,10 +72,67 @@ func (h *UserHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
+
+	token, err := auth.GenerateToken(user.UserID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login Berhasil", 
+		"token": token,
+		"user" : gin.H{
+			"user_id": user.UserID,
+			"email": user.Email,
+			"name": user.Name,
+		},
+	})
+}
+
+func (h *UserHandler) GetUser(c *gin.Context) {
+	userID := c.Param("user_id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user_id is required"})
+		return
+	}
+
+	user, err := h.uuc.GetUser(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User found",
 		"user_id": user.UserID,
 		"email": user.Email,
+		"name": user.Name,
+		"balance": user.Balance,
+		"role_id": user.RoleID,
+	})
+}
+
+func (h *UserHandler) GetProfile(c *gin.Context) {
+	userID := c.GetString("user_id") // from middleware
+	if userID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "not logged in"})
+		return
+	}
+
+	user, err := h.uuc.GetUser(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User found",
+		"user_id": user.UserID,
+		"email":   user.Email,
+		"name":    user.Name,
+		"balance": user.Balance,
+		"role_id": user.RoleID,
 	})
 }
 

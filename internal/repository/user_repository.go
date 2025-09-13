@@ -10,6 +10,7 @@ type UserRepository interface {
 	CreateUser(user *entity.User) error
 	DeleteUser(userID string) error
 	GetUserByEmail(email string) (*entity.User, error)
+	GetUserByID(userID string) (*entity.User, error)
 	GetLastUserID() (string, error)
 }
 
@@ -35,6 +36,16 @@ func (urd *userRepositoryData) GetUserByEmail(email string) (*entity.User, error
 	if result.Error != nil {
 		return nil, result.Error
 	}
+	return &user, nil
+}
+
+func (urd *userRepositoryData) GetUserByID(userID string) (*entity.User, error) {
+	var user entity.User
+	result := urd.db.Where("user_id = ?", userID).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	
 	return &user, nil
 }
 
