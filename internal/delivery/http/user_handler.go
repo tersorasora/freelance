@@ -122,12 +122,13 @@ func (h *UserHandler) GetProfile(c *gin.Context) {
 
 	user, err := h.uuc.GetUser(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"errorwagu": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "User found",
+		"token": c.GetString("token"),
 		"user_id": user.UserID,
 		"email":   user.Email,
 		"name":    user.Name,
