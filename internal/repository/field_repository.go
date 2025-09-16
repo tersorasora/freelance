@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/tersorasora/freelance/internal/entity"
 
 	"gorm.io/gorm"
@@ -24,6 +26,7 @@ func NewFieldRepository(db *gorm.DB) FieldRepository {
 }
 
 func (frd *fieldRepositoryData) CreateField(field *entity.Field) error {
+	fmt.Println("lewat2")
 	return frd.db.Create(field).Error
 }
 

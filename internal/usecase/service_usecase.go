@@ -19,12 +19,10 @@ type ServiceUseCase interface {
 
 type serviceUseCase struct {
 	serviceRepo     repository.ServiceRepository
-	userRepo   		repository.UserRepository
-	fieldRepo  		repository.FieldRepository
 }
 
-func NewServiceUseCase(sR repository.ServiceRepository, uR repository.UserRepository, fR repository.FieldRepository) ServiceUseCase {
-	return &serviceUseCase{sR, uR, fR}
+func NewServiceUseCase(sR repository.ServiceRepository) ServiceUseCase {
+	return &serviceUseCase{sR}
 }
 
 func (suc *serviceUseCase) CreateService(serviceName, description string, price float64, period string, fieldID string, userID string) (*entity.Service, error) {

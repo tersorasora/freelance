@@ -63,7 +63,7 @@ func (uuc *userUsecase) RegisterUser(email string, name string, password string)
 		Name:   name,
 		Password: string(hashedPassword),
 		Balance: 0.00,
-		RoleID: "RLI-2", // Default role as regular user
+		RoleID: "RL-2", // Default role as regular user
     }
 
     err = uuc.repo.CreateUser(user)

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 	"strings"
+	"fmt"
 
 	"github.com/tersorasora/freelance/internal/entity"
 	"github.com/tersorasora/freelance/internal/repository"
@@ -20,19 +21,22 @@ type fieldUseCase struct {
 	repo repository.FieldRepository
 }
 
-func NewFieldUseCae(r repository.FieldRepository) FieldUseCase {
+func NewFieldUseCase(r repository.FieldRepository) FieldUseCase {
 	return &fieldUseCase{r}
 }
 
 func (fuc *fieldUseCase) CreateField(name string) (*entity.Field, error) {
-	field, err := fuc.repo.GetFieldByName(name)
-	if err == nil && field != nil {
-		return nil, errors.New("field sudah terdaftar")
-	}
-
+	fmt.Println("lewat3")
 	lastID, err := fuc.repo.GetLastFieldID()
 	if err != nil {
 		return nil, err
+	}
+
+	if lastID != "" {
+		nameFound, err := fuc.repo.GetFieldByName(name)
+		if err == nil && nameFound != nil {
+			return nil, errors.New("field sudah terdaftar")
+		}
 	}
 
 	var newID int
@@ -41,6 +45,7 @@ func (fuc *fieldUseCase) CreateField(name string) (*entity.Field, error) {
 		newID = 1
 	}else{
 		parts := strings.Split(lastID, "-")
+		fmt.Println("lewat4")
 		if len(parts) == 2 {
 			lastNumber, _ := strconv.Atoi(parts[1])
 			newID = lastNumber + 1
@@ -50,7 +55,7 @@ func (fuc *fieldUseCase) CreateField(name string) (*entity.Field, error) {
 	}
 	newFieldID = "FID-" + strconv.Itoa(newID)
 
-	field = &entity.Field{
+	field := &entity.Field{
 		FieldID:   newFieldID,
 		FieldName: name,
 	}

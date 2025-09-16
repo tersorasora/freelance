@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-    "github.com/tersorasora/freelance/internal/usecase"
+	"github.com/tersorasora/freelance/internal/usecase"
 )
 
 type FieldHandler struct {
@@ -24,11 +25,15 @@ func (h *FieldHandler) CreateField(c *gin.Context) {
 		Name string `json:"name" binding:"required"`
 	}
 
+	fmt.Println("lewat")
+
 	var req FieldRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Println("lewat1")
 
 	field, err := h.fuc.CreateField(req.Name)
 	if err != nil {
@@ -38,7 +43,7 @@ func (h *FieldHandler) CreateField(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Field created successfully",
-		"fieldid": field.FieldID,
+		"field id": field.FieldID,
 		"name": field.FieldName,
 	})
 }

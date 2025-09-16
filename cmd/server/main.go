@@ -32,12 +32,23 @@ func main() {
     db.AutoMigrate(&entity.User{})
 
     // Setup layers
-    repo := repository.NewUserRepository(db)
-    uc := usecase.NewUserUsecase(repo)
+    // User
+    userRepo := repository.NewUserRepository(db)
+    userUC := usecase.NewUserUsecase(userRepo)
+
+    // Field
+    fieldRepo := repository.NewFieldRepository(db)
+    fieldUc := usecase.NewFieldUseCase(fieldRepo)
+
+    // Service
+    serviceRepo := repository.NewServiceRepository(db)
+    serviceUC := usecase.NewServiceUseCase(serviceRepo)
 
     // Setup HTTP server
     r := gin.Default()
-    handler.NewUserHandler(r, uc)
+    handler.NewUserHandler(r, userUC)
+    handler.NewFieldHandler(r, fieldUc)
+    handler.NewServiceHandler(r, serviceUC)
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"}, // Your React app URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
