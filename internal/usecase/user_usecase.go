@@ -15,6 +15,7 @@ type UserUsecase interface {
 	LoginUser(email, password string) (*entity.User, error)
 	GetUser(userID string) (*entity.User, error)
 	DeleteUser(userID string) error
+	GetTotalUsers() (int64, error)
 }
 
 type userUsecase struct {
@@ -103,4 +104,12 @@ func (uuc *userUsecase) DeleteUser(userID string) error {
 	}
 
 	return nil
+}
+
+func (uuc *userUsecase) GetTotalUsers() (int64, error) {
+	total, err := uuc.repo.GetTotalUsers()
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
 }

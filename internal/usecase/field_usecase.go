@@ -15,6 +15,7 @@ type FieldUseCase interface {
 	DeleteField(fieldID string) error
 	GetAllFields() ([]entity.Field, error)
 	GetFieldByID(fieldID string) (*entity.Field, error)
+	GetTotalFields() (int64, error)
 }
 
 type fieldUseCase struct {
@@ -93,4 +94,12 @@ func (fuc *fieldUseCase) GetFieldByID(fieldID string) (*entity.Field, error) {
 	}
 
 	return field, nil
+}
+
+func (fuc *fieldUseCase) GetTotalFields() (int64, error) {
+	total, err := fuc.repo.GetTotalFields()
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
 }

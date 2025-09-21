@@ -46,15 +46,15 @@ func main() {
 
     // Setup HTTP server
     r := gin.Default()
-    handler.NewUserHandler(r, userUC)
-    handler.NewFieldHandler(r, fieldUc)
-    handler.NewServiceHandler(r, serviceUC)
-	r.Use(cors.New(cors.Config{
+    r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"}, // Your React app URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}))
+    handler.NewUserHandler(r, userUC)
+    handler.NewFieldHandler(r, fieldUc)
+    handler.NewServiceHandler(r, serviceUC)
 
     log.Println("Server running on :8080")
     r.Run(":8080")

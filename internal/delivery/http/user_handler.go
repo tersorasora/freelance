@@ -18,6 +18,7 @@ func NewUserHandler(router *gin.Engine, uuc usecase.UserUsecase) {
 	router.POST("/register", handler.Register)
 	router.POST("/login", handler.Login)
 	router.GET("/user/:user_id", handler.GetUser)
+	router.GET("/total_users", handler.GetTotalUsers)
 	
 	// protected routes
 	authGroup := router.Group("/")
@@ -151,4 +152,13 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User berhasil dihapus"})
+}
+
+func (h *UserHandler) GetTotalUsers(c *gin.Context) {
+	total, err := h.uuc.GetTotalUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"total_users": total})
 }

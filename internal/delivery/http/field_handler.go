@@ -18,6 +18,7 @@ func NewFieldHandler(router *gin.Engine, fuc usecase.FieldUseCase) {
 	router.GET("/fields", handler.GetAllFields)
 	router.GET("/fields/:field_id", handler.GetFieldByID)
 	router.DELETE("/fields/:field_id", handler.DeleteField)
+	router.GET(("/total_fields"), handler.GetTotalFields)
 }
 
 func (h *FieldHandler) CreateField(c *gin.Context) {
@@ -73,4 +74,13 @@ func (h *FieldHandler) DeleteField(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Field deleted successfully"})
+}
+
+func (h *FieldHandler) GetTotalFields(c *gin.Context) {
+	total, err := h.fuc.GetTotalFields()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"total_fields": total})
 }

@@ -16,6 +16,7 @@ func NewServiceHandler(router *gin.Engine, suc usecase.ServiceUseCase) {
 	handler := &ServiceHandler{suc}
 	router.GET("/services", handler.GetAllServices)
 	router.GET("/services/search", handler.SearchServices)
+	router.GET("/total_services", handler.GetTotalServices)
 	
 	// protected routes
 	authGroup := router.Group("/")
@@ -117,4 +118,13 @@ func (h *ServiceHandler) DeleteService(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Service deleted successfully"})
+}
+
+func (h *ServiceHandler) GetTotalServices(c *gin.Context) {
+	total, err := h.suc.GetTotalServices()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"total_services": total})
 }

@@ -15,6 +15,7 @@ type ServiceUseCase interface {
 	SearchServices(serviceName string, fieldID string) ([]entity.Service, error)
 	GetAllServices() ([]entity.Service, error)
 	GetMyServices(userID string) ([]entity.Service, error)
+	GetTotalServices() (int64, error)
 }
 
 type serviceUseCase struct {
@@ -92,4 +93,12 @@ func (suc *serviceUseCase) GetMyServices(userID string) ([]entity.Service, error
 		return nil, err
 	}
 	return myServices, nil
+}
+
+func (suc *serviceUseCase) GetTotalServices() (int64, error) {
+	total, err := suc.serviceRepo.GetTotalServices()
+	if err != nil {
+		return 0, err
+	}
+	return total, nil
 }

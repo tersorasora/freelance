@@ -13,6 +13,7 @@ type ServiceRepository interface {
 	GetMyServices(userID string) ([]entity.Service, error)
 	SearchServices(serviceName string, fieldID string) ([]entity.Service, error)
 	GetLastServiceID() (string, error)
+	GetTotalServices() (int64, error)
 }
 
 type serviceRepositoryData struct {
@@ -76,4 +77,13 @@ func (srd *serviceRepositoryData) GetLastServiceID() (string, error) {
 		return "", err
 	}
 	return lastID, nil
+}
+
+func (srd *serviceRepositoryData) GetTotalServices() (int64, error) {
+	var totalServices int64
+	err := srd.db.Model(&entity.Service{}).Count(&totalServices).Error
+	if err != nil{
+		return 0, err
+	}
+	return totalServices, nil
 }

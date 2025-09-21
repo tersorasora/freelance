@@ -12,6 +12,7 @@ type UserRepository interface {
 	GetUserByEmail(email string) (*entity.User, error)
 	GetUserByID(userID string) (*entity.User, error)
 	GetLastUserID() (string, error)
+	GetTotalUsers() (int64, error)
 }
 
 type userRepositoryData struct {
@@ -58,4 +59,13 @@ func (urd *userRepositoryData) GetLastUserID() (string, error) {
 	}
 
 	return lastUser, nil
+}
+
+func (urd *userRepositoryData) GetTotalUsers() (int64, error) {
+	var totalUser int64
+	err := urd.db.Model(&entity.User{}).Count(&totalUser).Error
+	if err != nil{
+		return 0, err
+	}
+	return totalUser, nil
 }

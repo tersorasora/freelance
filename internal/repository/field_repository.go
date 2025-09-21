@@ -15,6 +15,7 @@ type FieldRepository interface {
 	GetFieldByName(fieldName string) (*entity.Field, error)
 	GetFieldByID(fieldID string) (*entity.Field, error)
 	GetLastFieldID() (string, error)
+	GetTotalFields() (int64, error)
 }
 
 type fieldRepositoryData struct {
@@ -71,4 +72,13 @@ func (frd *fieldRepositoryData) GetLastFieldID() (string, error) {
 		return "", err
 	}
 	return lastField, nil
+}
+
+func (frd *fieldRepositoryData) GetTotalFields() (int64, error) {
+	var totalFields int64
+	err := frd.db.Model(&entity.Field{}).Count(&totalFields).Error
+	if err != nil{
+		return 0, err
+	}
+	return totalFields, nil
 }
